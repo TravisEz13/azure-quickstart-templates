@@ -272,7 +272,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/windows-server-containers-preview/azure-containers.ps1"
+                "https://raw.githubusercontent.com/travisez13/azure-quickstart-templates/master/windows-server-containers-preview/azure-containers.ps1"
               ],
               "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File azure-containers.ps1 -adminuser ',parameters('adminUsername'))]"
             }
