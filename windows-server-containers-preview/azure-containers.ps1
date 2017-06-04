@@ -18,21 +18,30 @@ param (
 
 # Script body for post reboot execution.
 
-function install-script {
+function Get-InstallScript {
     "   
-    # TP5 Contianer Installation`r
-    # Install Windows Server Core Image`r`n
-    Install-PackageProvider ContainerImage -Force`r
-    Install-ContainerImage -Name WindowsServerCore`r`n    
-    # Install Docker daemon and client`r`n
-    Invoke-WebRequest https://aka.ms/tp5/Update-Container-Host -OutFile update-containerhost.ps1`r
-    .\update-containerhost.ps1`r
-    docker tag windowsservercore:10.0.14300.1000 windowsservercore:latest`r`n
-    # Remove Scheduled Task`r`n
-    schtasks /DELETE /TN scriptcontianers /F"
+    # TP5 Contianer Installation
+    # Install Windows Server Core Image
+    netsh advfirewall firewall add rule name='Docker daemon' dir=in action=allow protocol=TCP localport=2375
+    new-item -Type File c:\ProgramData\docker\config\daemon.json
+    Add-Content 'c:\programdata\docker\config\daemon.json' @'
+    { 
+        `"hosts`": [`"tcp://0.0.0.0:2375`", `"npipe://`"]
+    }
+    new-item -Type File c:\ProgramData\docker\config\daemon-template.json
+    Add-Content 'c:\programdata\docker\config\daemon-template.json' @'
+    { 
+        `"hosts`": [`"tcp://0.0.0.0:2375`", `"npipe://`"],
+        `"tlsverify`": true,
+        `"tlscert`": `"C:\\cert.ext`",
+        `"tlskey`": `"C:\\cert.ext`",
+        `"tlscacert`": `"C:\\cert.ext`"
+    }
+'@
+    "
 }
 
-Install-Script > c:\windos-containers.ps1
+Get-InstallScript > c:\windos-containers.ps1
 
 # Create scheduled task.
 
@@ -42,5 +51,6 @@ Register-ScheduledTask -TaskName "scriptcontianers" -Action $action -Trigger $tr
 
 # Install container role
 
-Install-WindowsFeature containers
+Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
+Install-Package -Name docker -ProviderName DockerMsftProvider
 Restart-Computer -Force      
