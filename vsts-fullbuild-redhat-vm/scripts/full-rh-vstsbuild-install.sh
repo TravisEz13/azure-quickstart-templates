@@ -3,6 +3,14 @@
 /bin/date +%H:%M:%S > /home/$5/install.progress.txt
 echo "ooooo      REDHAT VSTS BUILD INSTALL      ooooo" >> /home/$5/install.progress.txt
 
+echo "Register the Microsoft RedHat repository" >> /home/$5/install.progress.txt
+# Register the Microsoft RedHat repository
+curl https://packages.microsoft.com/config/rhel/7/prod.repo | tee /etc/yum.repos.d/microsoft.repo
+
+echo "Install PowerShell" >> /home/$5/install.progress.txt
+# Install PowerShell
+yum install -y powershell
+
 echo "Initial basic development packages" >> /home/$5/install.progress.txt
 yum install -y gcc > /home/$5/install.out.txt 2>&1
 yum install -y gcc-c++ >> /home/$5/install.out.txt 2>&1
